@@ -6,6 +6,10 @@ Version 0.07
 
 Contact: vqngo@ucsd.edu
 
+## Note
+
+The original code is not able to run due to some issues such as mixing spaces and tabs that causes indetation errors. This is a workable version. I have tested it.
+
 ## Installation
 
 - The programs were written in [Python2.7](https://www.python.org/downloads/) and [Julia](https://julialang.org/downloads/) (tested with Julia v0.6.2 )

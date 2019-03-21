@@ -10,6 +10,10 @@ Contact: vqngo@ucsd.edu
 
 The original code is not able to run due to some issues such as mixing spaces and tabs that causes indetation errors. This is a workable version. I have tested it.
 
+I also added an HTML report feature. Usage: `-ml y` will run this feature. Dependency: pandas.
+
+BTW, julia has to be 0.6.2 or lower, mine is 0.6.1.
+
 ## Installation
 
 - The programs were written in [Python2.7](https://www.python.org/downloads/) and [Julia](https://julialang.org/downloads/) (tested with Julia v0.6.2 )

@@ -210,7 +210,7 @@ class Sequence(object):
 
     def nice(self):
         """ A short description of the sequence """
-        print self.getName(), ":", self.getLen()
+        a= "asd"
 
 def readStrings(filename):
     """ Read one or more lines of text from a file--for example an alignment.
@@ -243,7 +243,7 @@ def readFASTA(filename, alpha = None, string_only = False):
                     else:
                         seqnew = Sequence(seqdata, alpha, seqname, seqinfo)
                     seqlist.append(seqnew)
-                except RuntimeError, e:
+                except RuntimeError:
                     print >> sys.stderr, "Warning: "+seqname+" is invalid (ignored): ", e
             seqinfo = thisline[1:-1]         # everything on the defline is "info"
             seqname = seqinfo.split()[0]     # up to first space
@@ -261,7 +261,7 @@ def readFASTA(filename, alpha = None, string_only = False):
             else:
                 seqnew = Sequence(seqdata, alpha, seqname, seqinfo)
             seqlist.append(seqnew)
-        except RuntimeError, e:
+        except RuntimeError:
             print >> sys.stderr, "Warning: " + seqname + " is invalid (ignored): ", e
     else:
         raise RuntimeError("No sequences on FASTA format found in this file")
@@ -711,10 +711,10 @@ def convert_ambigs(strings):
     """
     ms = string.maketrans("URYKMBVDHSW", "TNNNNNNNNNN")
     for i in range(len(strings)):
-	# make upper case and replace all DNA IUPAC characters with N
-	# replace U with T
-	strings[i] = strings[i].upper()
-	strings[i] = strings[i].translate(ms)
+    # make upper case and replace all DNA IUPAC characters with N
+    # replace U with T
+        strings[i] = strings[i].upper()
+        strings[i] = strings[i].translate(ms)
     return(strings)
 
 

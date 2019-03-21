@@ -38,10 +38,11 @@ def insertEtochrom(chrom,hashdata,chromseq,threshold):
     for loc in hashdata[chrom]:
         if num%100000==0:print num,nummet,numerr
         if hashdata[chrom][loc]>=threshold and (chromseq[loc-1].upper()=="C" or chromseq[loc-1].upper()=="E"):
-        	chromseq[loc-1]='E'
-        	nummet+=1
+            chromseq[loc-1]='E'
+            # print chromseq[loc-1]
+            nummet+=1
         else:
-        	numerr+=1
+            numerr+=1
         num+=1
     print "done inserting E to list.",nummet,"positions converted to E.",numerr,"positions were not converted."
     chromreturn=''.join(chromseq)
@@ -93,13 +94,13 @@ def main():
     usage = """USAGE: 
     %s [options]
 
-        -f <filename>  		input file, default is wig format
+        -f <filename>          input file, default is wig format
         --wig                   indicates that the input file is in wig format
         --typeEF                convert the modified base to E and the complementary base to F, default is False (optional)
         -t <number>             methylation threshold above which C will be considered E, default is 0.5 (optional)       
-        -r <ref_genome> 	directory of the reference genome (best put in a separate directory)
-        -o <output dir> 	name of the output dir to be created (eg. hg19_methylated)
-        -h              	print this usage message
+        -r <ref_genome>     directory of the reference genome (best put in a separate directory)
+        -o <output dir>     name of the output dir to be created (eg. hg19_methylated)
+        -h                  print this usage message
     """ % (sys.argv[0])
 
     # parse command line
@@ -110,14 +111,14 @@ def main():
             i += 1
             try: wigfile = sys.argv[i]
             except:
-            	print " Error in -f" 
-            	sys.exit(1)
+                print " Error in -f" 
+                sys.exit(1)
         elif (arg == "-t"):
             i += 1
             try: threshold = float(sys.argv[i])
             except:
-            	print "Error in -t" 
-            	sys.exit(1)
+                print "Error in -t" 
+                sys.exit(1)
         elif (arg == "--wig"):
             #i += 1
             #print "Is Bed"
@@ -136,36 +137,36 @@ def main():
             i += 1
             try: genome_dir = sys.argv[i]
             except:
-            	print "Error in -r, please check the command", sys.argv
-            	sys.exit(1)
+                print "Error in -r, please check the command", sys.argv
+                sys.exit(1)
         elif (arg == "-o"):
             i += 1
             try: outdir = sys.argv[i]
             except:
-            	print "Error in -o" 
-            	sys.exit(1)
+                print "Error in -o" 
+                sys.exit(1)
         elif (arg == "-h"):
-        	print >> sys.stderr, usage; sys.exit(1)
+            print >> sys.stderr, usage; sys.exit(1)
         else:
             print >> sys.stderr, "Unknown command line argument: " + arg + " \nPlease check the usage with -h"
             sys.exit(1)
         i += 1
     # check that required arguments given
     if (wigfile == None):
-    	print "No input, exit."
-    	print >> sys.stderr, usage; sys.exit(1)
-    	sys.exit(1)
+        print "No input, exit."
+        print >> sys.stderr, usage; sys.exit(1)
+        sys.exit(1)
     elif (outdir == None):
-    	print "No output, exit."
-    	sys.exit(1)
+        print "No output, exit."
+        sys.exit(1)
     elif (genome_dir == None):
-    	print "No reference genome selected, exit."
-    	sys.exit(1)
+        print "No reference genome selected, exit."
+        sys.exit(1)
 
     
     print "Working with",wigfile,genome_dir,outdir
 
-    
+    print typeEF
 
     metdata={}
     if isWig == True:
@@ -203,6 +204,7 @@ def main():
             except KeyError:
                 metdata[chrom]={}
                 metdata[chrom][loc+1]=value
+            # print metdata[chrom][loc+1]
         for chrom in metdata:
             print chrom, len(metdata[chrom]),'positions'
     #print metdata
@@ -211,12 +213,17 @@ def main():
     print "Loading the reference genome..."
     genome={}
     filelist=os.listdir(genome_dir)
+    print filelist
     for f in filelist:
+        print f
         #if "chr" == f[:3]:
-        seq=readFASTA(genome_dir+'/'+f)
-        chrom = f.strip()
-        genome[chrom]=seq
-        print "loaded",chrom
+        try:
+            seq=readFASTA(genome_dir+'/'+f)
+            chrom = f.strip().replace(".fa","")
+            genome[chrom]=seq
+            print "loaded",chrom
+        except:
+            continue
     chromnames=sorted(genome.keys())
     #print chromnames
     #inserting E to each chromosome
@@ -231,14 +238,15 @@ def main():
     else:
         for chrom in chromnames:
             if chrom not in metdata:
+                print metdata.keys()
                 print "No methylation information for chromosome",chrom
                 #continue
             else:
                 temp = insertEtochrom(chrom,metdata,genome[chrom],threshold)
                 genome[chrom]=temp
         #print genome
-	
-	#error checking step
+    
+    #error checking step
     num=0
     numerr=0
     for chrom in metdata.keys():
@@ -262,7 +270,7 @@ def main():
 
 
     for chrom in genome:
-    	print chrom
+        print chrom
         target=open(outdir+"/"+chrom,"w")
         target.write(">"+chrom+"\n")
         target.write(genome[chrom])

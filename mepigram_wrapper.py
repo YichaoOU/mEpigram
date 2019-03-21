@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 """
 TODO: 
@@ -193,8 +193,8 @@ def main():
 	if args.makelogo != "y" and args.makelogo != "n":
 		print "ERROR: parameter not recognized in --makelogo:", args.makelogo
 		sys.exit(1)
-		if args.makelogo == "y":
-			makelogo = True
+	if args.makelogo == "y":
+		makelogo = True
 	if mode != "typeE" and mode != "typeEF":
 		print "ERROR: paramether not recognized in --mode:", args.mode
 
@@ -207,7 +207,7 @@ def main():
 		sys.exit(1)
 	if os.path.isdir(graphdir) == False:
 		print "ERROR: graph dir doesn't exist at",graphdir
-		sys.exist(1)
+		sys.exit(1)
 	if (outfile == None):
 		outfile = faafile+".mepigram"
 		print "No output file specified, will use the default",outfile
@@ -250,18 +250,18 @@ def main():
 	shufflefile=faaname+'.'+str(seed)+".DS.tmp.faa"
 	command=''
 	if mode == 'typeE':
-		command="python fasta-dinucleotide-shuffle_typeE.py -s "+str(seed)+" -f "+faaname+" -c "+str(timestoshuffle)+" > "+shufflefile
+		command="python2 fasta-dinucleotide-shuffle_typeE.py -s "+str(seed)+" -f "+faaname+" -c "+str(timestoshuffle)+" > "+shufflefile
 	else:
-		command="python fasta-dinucleotide-shuffle_typeEF.py -s "+str(seed)+" -f "+faaname+" -c "+str(timestoshuffle)+" > "+shufflefile
+		command="python2 fasta-dinucleotide-shuffle_typeEF.py -s "+str(seed)+" -f "+faaname+" -c "+str(timestoshuffle)+" > "+shufflefile
 
 	print command
 	os.system(command)
 
 	print "Running mEpigram... "
 	if mode == 'typeE':
-		command="python mepigram_typeE.py "+faaname+" "+shufflefile+" "+backgroundfile+" "+graphdir +" "+outfile+" "+str(maxmotifnum)
+		command="python2 mepigram_typeE.py "+faaname+" "+shufflefile+" "+backgroundfile+" "+graphdir +" "+outfile+" "+str(maxmotifnum)
 	else:
-		command="python mepigram_typeEF.py "+faaname+" "+shufflefile+" "+backgroundfile+" "+graphdir +" "+outfile+" "+str(maxmotifnum)
+		command="python2 mepigram_typeEF.py "+faaname+" "+shufflefile+" "+backgroundfile+" "+graphdir +" "+outfile+" "+str(maxmotifnum)
 	print command
 	os.system(command)
 
@@ -310,7 +310,7 @@ def main():
 	calcBaseComp(backgroundfile,alphabet,baseCompositionFile)
 	
 	"""
-	command="python baseComposition.py "+backgroundfile+" "+baseCompositionFile
+	command="python2 baseComposition.py "+backgroundfile+" "+baseCompositionFile
 	print command
 	os.system(command)
 	"""
@@ -371,7 +371,7 @@ def main():
 		print motif
 		if len(scannedresults[motif])!=2:
 			print "ERROR!!!: number of scanned files for motif",motif,"is not 2"
-		command="python2.7 fisher_P-value.py "+resultdir+'/'+scannedresults[motif]['P']+" "+resultdir+'/'+scannedresults[motif]['N']+" "+resultdir+'/'+motif+".fisher.tmp" +" "+motif
+		command="python2 fisher_P-value.py "+resultdir+'/'+scannedresults[motif]['P']+" "+resultdir+'/'+scannedresults[motif]['N']+" "+resultdir+'/'+motif+".fisher.tmp" +" "+motif
 		#print command
 		os.system(command)
 		fisherresults+=[open(resultdir+'/'+motif+".fisher.tmp").read().strip()]
@@ -386,28 +386,37 @@ def main():
 
 	if makelogo:
 		logodir = memefile + '.LOGOS'
+		print "motif logo is here: ",logodir
 		if mode == "typeE":
-			cmd = "python makeLOGO.py -m %s -o %s" %(memefile, logodir)
+			cmd = "python2 makeLOGO.py -m %s -o %s" %(memefile, logodir)
 		else:
-			cmd = "python makeLOGO.py --typeEF -m %s -o %s" %(memefile, logodir)
+			cmd = "python2 makeLOGO.py --typeEF -m %s -o %s" %(memefile, logodir)
 
 		print "Making motif LOGOs..."
 		os.system(cmd)
+		# make html report
+		html_file = outfile+".motifs.html"
+		cmd = "python2 make_html.py "+resultdir+'/enrichments.tsv ' + logodir + " " + html_file
+		print cmd
+		os.system(cmd)
 		os.system("mv %s %s"%(logodir, resultdir))
+		os.system("mv %s %s"%(html_file, resultdir))
 
-
+	print outfile,memefile,resultdir
 	os.system("mv %s %s" %(memefile, resultdir+"/motifs.mepigram.meme"))
 	os.system("mv %s %s" %(outfile, resultdir))
 
+	
+	
 
 
-	#print "Cleaning up temporary files..."
+	print "Cleaning up temporary files..."
 	os.system("rm "+shufflefile)
-	#ftoremove=[]
+	ftoremove=[]
 	for file in os.listdir(resultdir):
 		if "tmp" in file:
 			command="rm "+resultdir+'/'+file
-			#print command
+			print command
 			os.system(command)
 
 	
